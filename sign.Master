@@ -1,0 +1,1015 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="sign.master.cs" Inherits="SigningFormGenerator.sign" %>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+       <link rel="shortcut icon" type="image/png" href="Assets/images/cec.ico">
+    <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
+ 
+    
+    <!-- Bootstrap CSS -->
+    <link href="Assets/css/bootstrap.min.css?v=1.1" rel="stylesheet" />
+    <!-- Theme Design -->
+    <link href="Assets/css/all.css?v=1.1" rel="stylesheet" />
+    <link href="Assets/css/style.css?ver=1.1" rel="stylesheet" />
+    <link href="Assets/css/responsive.css?ver=1.1" rel="stylesheet" /> 
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> 
+      <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery (required for Bootstrap's JS plugins) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Alpine.js CDN -->
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" defer></script>
+
+    <!-- Leaflet.js CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css"/>
+
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js?v=1.1"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <!-- Bootstrap JavaScript (required for modal) -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- PDF.js and PDF-Lib -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+ 
+    <style>
+		.sidebar .dropdown-menu{
+			display: block;
+			position: static;
+			background-color: #265598;
+			padding: 0px;
+			border: 1px solid #265598;
+		}
+		
+		.sidebar .dropdown-item {
+		    display: block;
+		    width: 100%;
+		    padding: 8px 15px;
+		    clear: both;
+		    font-weight: 400;
+		    color: #ffffff;
+		    text-align: inherit;
+		    text-decoration: none;
+		    white-space: nowrap;
+		    background-color: #265598;
+		    border: 0px solid #fff;
+		}
+		
+		.sidebar .dropdown-item:hover {
+		    background-color: #1c4277;
+		}
+		 .container  {
+        max-width: 1420px;
+    }
+         .dropdown-item.active {
+    background-color: #1c4277;
+    color: #fff; 
+}
+      
+		
+    #pdf-container {
+        position: relative;
+    }
+
+    #pdfCanvas {
+        display: block;
+    }
+
+    /*#fieldOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;*/ /*  overlay transparent */
+        /*cursor: crosshair; 
+    }*/
+
+   /* .draggable-input {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 5px;
+        cursor: move;
+    }*/
+      /*.signature-box {
+        width: 200px;
+        height: 60px;
+        border: 2px solid #ccc;
+        text-align: center;*/
+        /*line-height: 100px;*/
+        /*cursor: pointer;
+        background-size: cover;
+        background-position: center;
+    }*/
+      /*  .draggable-input-wrapper {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 5px;
+            cursor: move;
+        }*/
+
+      /*  .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 0 5px;
+            z-index: 1;
+        }*/
+</style>
+       <style>
+        #pdf-container {
+            position: relative;
+            max-height: 600px; /* Adjust this height as needed */
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #pdfCanvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .pdfPage {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .fieldOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            cursor: crosshair;
+        }
+
+        .draggable-input-wrapper {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 2px;
+            cursor: move;
+            z-index: 2;
+        }
+
+        .signature-box {
+            width: 200px;
+            height: 60px;
+            border: 2px solid #ccc;
+            text-align: center;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 0 5px;
+            z-index: 3;
+        }
+         
+    </style>
+
+    <style>
+
+        /*SIDEBAR CSS*/
+        :root {
+  --background: #9c88ff;
+  --navbar-width: 256px;
+  --navbar-width-min: 80px;
+  --navbar-dark-primary: #fff;
+  --navbar-dark-secondary: #2c3e50;
+  --navbar-light-primary: #f5f6fa;
+  --navbar-light-secondary: #1e1e1e;
+}
+
+html, body {
+  margin: 0;
+  background: var(--background);
+}
+
+#nav-toggle:checked ~ #nav-header {
+  width: calc(var(--navbar-width-min) - 16px);
+}
+#nav-toggle:checked ~ #nav-content, #nav-toggle:checked ~ #nav-footer {
+  width: var(--navbar-width-min);
+}
+#nav-toggle:checked ~ #nav-header #nav-title {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+#nav-toggle:checked ~ #nav-header label[for=nav-toggle] {
+  left: calc(50% - 8px);
+  transform: translate(-50%);
+}
+#nav-toggle:checked ~ #nav-header #nav-toggle-burger {
+  background: var(--navbar-light-primary);
+}
+#nav-toggle:checked ~ #nav-header #nav-toggle-burger:before, #nav-toggle:checked ~ #nav-header #nav-toggle-burger::after {
+  width: 16px;
+  background: var(--navbar-light-secondary);
+  transform: translate(0, 0) rotate(0deg);
+}
+#nav-toggle:checked ~ #nav-content .nav-button span {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+#nav-toggle:checked ~ #nav-content .nav-button .fas {
+  min-width: calc(100% - 16px);
+}
+#nav-toggle:checked ~ #nav-footer #nav-footer-avatar {
+  margin-left: 0;
+  left: 50%;
+  transform: translate(-50%);
+}
+#nav-toggle:checked ~ #nav-footer #nav-footer-titlebox, #nav-toggle:checked ~ #nav-footer label[for=nav-footer-toggle] {
+  opacity: 0;
+  transition: opacity 0.1s;
+  pointer-events: none;
+}
+
+#nav-bar {
+  position: absolute;
+  left: 1vw;
+  top: 1vw;
+  height: calc(100% - 2vw);
+  background: var(--navbar-dark-primary);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  color: var(--navbar-light-primary);
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  z-index: 900;
+}
+#nav-bar hr {
+  margin: 0;
+  position: relative;
+  left: 16px;
+  width: calc(100% - 32px);
+  border: none;
+  border-top: solid 1px var(--navbar-dark-secondary);
+}
+#nav-bar a {
+  color: inherit;
+  text-decoration: inherit;
+}
+#nav-bar input[type=checkbox] {
+  display: none;
+}
+
+#nav-header {
+  position: relative;
+  width: var(--navbar-width);
+  left: 16px;
+  width: calc(var(--navbar-width) - 16px);
+  min-height: 80px;
+  background: var(--navbar-dark-primary);
+  border-radius: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  transition: width 0.2s;
+}
+#nav-header hr {
+  position: absolute;
+  bottom: 0;
+}
+
+#nav-title {
+  font-size: 1.5rem;
+  transition: opacity 1s;
+}
+
+label[for=nav-toggle] {
+  position: absolute;
+  right: 0;
+  width: 3rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#nav-toggle-burger {
+  position: relative;
+  width: 16px;
+  height: 2px;
+  background: var(--navbar-dark-primary);
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+#nav-toggle-burger:before, #nav-toggle-burger:after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  width: 10px;
+  height: 2px;
+  background: var(--navbar-light-primary);
+  border-radius: 99px;
+  transform: translate(2px, 8px) rotate(30deg);
+  transition: 0.2s;
+}
+#nav-toggle-burger:after {
+  top: 6px;
+  transform: translate(2px, -8px) rotate(-30deg);
+}
+
+#nav-content {
+  margin: -16px 0;
+  padding: 16px 0;
+  position: relative;
+  flex: 1;
+ width: var(--navbar-width);
+  background: var(--navbar-dark-primary);
+  box-shadow: 0 0 0 16px var(--navbar-dark-primary);
+  direction: rtl;
+  overflow-x: hidden;
+  transition: width 0.2s;
+}
+#nav-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+#nav-content::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background-color: #D62929;
+}
+#nav-content::-webkit-scrollbar-button {
+  height: 16px;
+}
+
+
+
+.nav-button {
+  position: relative;
+  margin-left: 16px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  color: var(--navbar-light-secondary);
+  direction: ltr;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.2s;
+}
+.nav-button:hover{
+    background: #007AFF;
+}
+.nav-button span {
+  transition: opacity 1s;
+}
+.nav-button .fas {
+  transition: min-width 0.2s;
+}
+
+
+#nav-bar .fas {
+  min-width: 3rem;
+  text-align: center;
+}
+
+#nav-footer {
+  position: relative;
+  width: var(--navbar-width);
+  height: 54px;
+  background: var(--navbar-dark-secondary);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+  transition: width 0.2s, height 0.2s;
+}
+
+#nav-footer-heading {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  display: flex;
+  align-items: center;
+}
+
+#nav-footer-avatar {
+  position: relative;
+  margin: 11px 0 11px 16px;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  transform: translate(0);
+  transition: 0.2s;
+}
+#nav-footer-avatar img {
+  height: 100%;
+}
+
+#nav-footer-titlebox {
+  position: relative;
+  margin-left: 16px;
+  width: 10px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 1s;
+}
+
+#nav-footer-subtitle {
+  color: var(--navbar-light-secondary);
+  font-size: 0.6rem;
+}
+
+#nav-toggle:not(:checked) ~ #nav-footer-toggle:checked + #nav-footer {
+  height: 30%;
+  min-height: 54px;
+}
+#nav-toggle:not(:checked) ~ #nav-footer-toggle:checked + #nav-footer label[for=nav-footer-toggle] {
+  transform: rotate(180deg);
+}
+
+label[for=nav-footer-toggle] {
+  position: absolute;
+  right: 0;
+  width: 3rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+#nav-footer-content {
+  margin: 0 16px 16px 16px;
+  border-top: solid 1px var(--navbar-light-secondary);
+  padding: 16px 0;
+  color: var(--navbar-light-secondary);
+  font-size: 0.8rem;
+  overflow: auto;
+}
+#nav-footer-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+#nav-footer-content::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background-color: #D62929;
+}
+
+/*Main-Content*/
+.main-container {
+ 
+  position: absolute;
+  right: 1vw;
+  top: 1vw;
+  height: calc(100% - 2vw);
+  width: calc(100% - 290px);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  color: var(--navbar-light-primary);
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  overflow: hidden;
+  background: #ffffff;
+}
+.nav-link {
+  font-size: calc(1rem * (260 / 210));
+  padding: 10px;
+}
+    </style>
+</head>
+    <body class="antialiased scroll-smooth bg-gray-200" >
+
+             	<div x-data="{ sidemenu: false }" class="h-screen flex overflow-hidden" x-cloak @keydown.window.escape="sidemenu = false">
+
+                     		<div class="md:hidden">
+			<div @click="sidemenu = false" class="fixed inset-0 z-30 bg-gray-600 opacity-0 pointer-events-none transition-opacity ease-linear duration-300" :class="{'opacity-75 pointer-events-auto': sidemenu, 'opacity-0 pointer-events-none': !sidemenu}"></div>
+
+			<!-- Small Screen Menu -->
+			<div class="fixed inset-y-0 left-0 flex flex-col z-40 max-w-xs w-full bg-white transform ease-in-out duration-300 -translate-x-full" :class="{'translate-x-0': sidemenu, '-translate-x-full': !sidemenu}">
+
+				<!-- Brand Logo / Name -->
+				<div class="flex items-center px-6 py-3 h-16">
+					<div class="text-2xl font-bold tracking-tight text-gray-800">iaGlobal</div>
+				</div>
+				<!-- @end Brand Logo / Name -->
+
+				<div class="px-4 py-2 flex-1 h-0 overflow-y-auto">
+					<ul>
+						<li>
+							<a href="Dashboard.aspx" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-blue-700 hover:text-blue-600 hover:bg-gray-200 bg-gray-200">
+								<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+									<rect x="4" y="4" width="6" height="6" rx="1" />
+									<rect x="14" y="4" width="6" height="6" rx="1" />
+									<rect x="4" y="14" width="6" height="6" rx="1" />
+									<rect x="14" y="14" width="6" height="6" rx="1" />
+								</svg>
+								Dashboard
+							</a>
+						</li>
+
+						<li>
+							<a href="TemplateList.aspx" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+								<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+									<line x1="4" y1="19" x2="20" y2="19" />
+									<polyline points="4 15 8 9 12 11 16 6 20 10" />
+								</svg>
+								Form Templates
+							</a>
+						</li>
+
+						<li>
+							<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+								<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+									<polyline points="14 3 14 8 19 8" />
+									<path d="M17 21H7a2 2 0 0 1 -2 -2V5a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+									<line x1="9" y1="9" x2="10" y2="9" />
+									<line x1="9" y1="13" x2="15" y2="13" />
+									<line x1="9" y1="17" x2="15" y2="17" />
+								</svg>
+								Reportes
+							</a>
+						</li>
+
+						<li>
+							<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+								<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<circle cx="11.5" cy="8.5" r="5.5" />
+									<path d="M11.5 14v7" />
+								</svg>
+								Mapa
+							</a>
+						</li>
+
+						<li>
+							<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+								<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+									<path d="M16 6h3a 1 1 0 011 1v11a2 2 0 0 1 -4 0v-13a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1v12a3 3 0 0 0 3 3h11" />
+									<line x1="8" y1="8" x2="12" y2="8" />
+									<line x1="8" y1="12" x2="12" y2="12" />
+									<line x1="8" y1="16" x2="12" y2="16" />
+								</svg>
+								Historial
+							</a>
+						</li>
+
+						<li>
+							<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+								<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+									<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+									<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+									<circle cx="12" cy="12" r="3" />
+								</svg>
+								Configuración
+							</a>
+						</li>
+					</ul>
+				</div>
+
+			</div>
+			<!-- @end Small Screen Menu -->
+		</div>
+
+		<!-- Menu Above Medium Screen -->
+		<div class="bg-white w-64 min-h-screen overflow-y-auto hidden md:block shadow relative z-30">
+
+			<!-- Brand Logo / Name -->
+			<div class="flex items-center px-6 py-3 h-16">
+				<div class="text-2xl font-bold tracking-tight text-gray-800">iaGlobal</div>
+			</div>
+			<!-- @end Brand Logo / Name -->
+
+			<div class="px-4 py-2">
+				<ul>
+					<li>
+
+						<a href="Dashboard.aspx" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-blue-600 hover:text-blue-600 hover:bg-gray-200 bg-gray-200">
+							<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+								<rect x="4" y="4" width="6" height="6" rx="1" />
+								<rect x="14" y="4" width="6" height="6" rx="1" />
+								<rect x="4" y="14" width="6" height="6" rx="1" />
+								<rect x="14" y="14" width="6" height="6" rx="1" />
+							</svg>
+							Dashboard
+						</a>
+					</li>
+
+					<li>
+						<a href="TemplateList.aspx" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+							<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+								<line x1="4" y1="19" x2="20" y2="19" />
+								<polyline points="4 15 8 9 12 11 16 6 20 10" />
+							</svg>
+							Form Template
+						</a>
+					</li>
+
+					<li>
+						<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+							<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+								<polyline points="14 3 14 8 19 8" />
+								<path d="M17 21H7a2 2 0 0 1 -2 -2V5a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+								<line x1="9" y1="9" x2="10" y2="9" />
+								<line x1="9" y1="13" x2="15" y2="13" />
+								<line x1="9" y1="17" x2="15" y2="17" />
+							</svg>
+							Reportes
+						</a>
+					</li>
+
+					<li>
+						<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+							<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="11.5" cy="8.5" r="5.5" />
+								<path d="M11.5 14v7" />
+							</svg>
+							Mapa
+						</a>
+					</li>
+
+					<li>
+						<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+							<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+								<path d="M16 6h3a 1 1 0 011 1v11a2 2 0 0 1 -4 0v-13a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1v12a3 3 0 0 0 3 3h11" />
+								<line x1="8" y1="8" x2="12" y2="8" />
+								<line x1="8" y1="12" x2="12" y2="12" />
+								<line x1="8" y1="16" x2="12" y2="16" />
+							</svg>
+							Historial
+						</a>
+					</li>
+
+					<li>
+						<a href="#" class="mb-1 px-2 py-2 rounded-lg flex items-center font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-200">
+							<svg xmlns="http://www.w3.org/2000/svg" class="mr-4 opacity-50" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+								<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+								<circle cx="12" cy="12" r="3" />
+							</svg>
+							Configuración
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!-- @end Menu Above Medium Screen -->
+
+    <form class="main-container" runat="server">
+        <asp:HiddenField runat="server" ClientIDMode="Static" ID="hf_IsShowQBOMsg" Value="" />
+    
+        <div class="inside-container">
+        <div class="content d-flex flex-column flex-column-fluid">
+            <div class="subheader py-4 py-lg-12 subheader-transparent">
+                <div class="container d-flex align-items-center justify-content-between flex-wrap flex-sm-wrap flex-md-nowrap">
+                    <!--begin::Info-->
+                    <div class="w-100 d-block d-sm-block d-md-flex align-items-center flex-wrap mr-1 order-last order-sm-last order-md-first">
+                        <div class="w-100 d-md-block d-lg-flex justify-content-start align-items-center">
+
+                            <div>
+                                <div class="col topper">
+                                    <p class="text-start mb-0">
+                                        <span class="companyname" id="TopComapnyName" runat="server" style="color: #000;"></span>
+                                        <br>                                       
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="px-3 d-none d-sm-none d-md-none d-lg-block">
+                                <h1 class="text-white mb-0 opacity-75">|</h1>
+                            </div>
+
+                            <div class="py-2 d-block d-sm-block d-md-block d-lg-none">
+                                <hr style="height: 2px; color: white;">
+                            </div>
+                            
+                            <div>
+                                <div class="headcon d-flex">
+                                    <div class="text pl-3 align-self-center">
+                                        <h2 runat="server" id="h_PageName" class="pagetitle text-white font-weight-bold mb-0 opacity-75">Home</h2>
+                                    </div>
+                                    <a id="appcueToggle" href="javascript:Appcues.show('-LvfZuoFKg40RG0y7tVi')" style="display: block;">
+                                        <div class="icon d-flex justify-content-center align-items-center"><i class="fas fa-question"></i></div>
+                                    </a>
+                                </div>
+                            </div>
+
+                          
+
+                        </div>
+                    </div>
+
+                   
+                </div>
+            </div>
+        </div>
+
+
+
+
+        
+	        
+	        <div class="row" >
+    
+       <div >
+          <asp:ContentPlaceHolder ID="MainContent" runat="server" ClientIDMode="Static"></asp:ContentPlaceHolder>				                            
+     
+       </div>
+       <asp:ContentPlaceHolder ID="ScriptContent" runat="server" />
+  </div>
+            </div>
+    </form>
+
+
+
+
+    <footer class="footer-sec">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <p style="text-align:center">
+                        Copyright © 2024 All rights reserved by                        
+                        <a href="https://www.xceleran.com/" target="_blank">xceleran.com</a>
+                    </p>
+                </div>
+                <div class="col-12">
+                    <p id="SessionValue" runat="server">
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+        </div>
+
+<%--    <script src="Assets/js/bootstrap.bundle.min.js?v=1.1"></script>
+    <script src="Assets/js/jquery.simple-scroll-follow.min.js?v=1.1"></script>
+    <script src="Assets/js/customjs.js?v=1.1"></script> --%>
+     <script type="text/javascript">
+         GetUserName();
+         function GetUserName() {
+             $(document).attr("title", "XinatorCEC");
+             var username = '<%= Session["LoginUser"] %>';
+             $("#sp_LoggedInUser").html(username)
+
+         }
+     </script>
+
+<script>
+    $(document).ready(function () {
+        $('.dropdown-item').on('click', function () {
+            $('.dropdown-item').removeClass('active'); // Remove active class from all items
+            $(this).addClass('active'); // Add active class to the clicked item
+        });
+
+        // Optional: Preserve the active state on page reload if required
+        var currentUrl = window.location.href;
+        $('.dropdown-item').each(function () {
+            if (this.href === currentUrl) {
+                $(this).addClass('active');
+            }
+        });
+    });
+    function ShowCustomAlert(message) {
+        $.alert({
+            title: 'xceleran',
+            content: message,
+            icon: 'fa fa-info-circle',
+            animation: 'scale',
+            closeAnimation: 'scale',
+            opacity: 0.5,
+            buttons: {
+                okay: {
+                    text: 'Okay',
+                    btnClass: 'btn-blue'
+                }
+            }
+        });
+    }
+
+
+    $(function () {
+        $(".dropdown-menu > li > a.trigger").on("click", function (e) {
+            var current = $(this).next();
+
+            var grandparent = $(this).parent().parent();
+            if ($(this).hasClass('left-caret') || $(this).hasClass('right-caret'))
+                $(this).toggleClass('right-caret left-caret');
+            grandparent.find('.left-caret').not(this).toggleClass('right-caret left-caret');
+            grandparent.find(".sub-menu:visible").not(current).hide();
+            current.toggle();
+            e.stopPropagation();
+        });
+        $(".dropdown-menu > li > a:not(.trigger)").on("click", function () {
+            var root = $(this).closest('#dropdown');
+
+            root.find('.left-caret').toggleClass('right-caret left-caret');
+            root.find('.sub-menu:visible').hide();
+        });
+    });
+    $(document).ready(function () {
+        var CanAccessQuickBooks = '<%=Session["CanAccessQuickBooks"]%>';
+            if (CanAccessQuickBooks == "False") {
+                //  $('#link_QboConnection').hide();
+            }
+            var CanAccessUserInfo = '<%=Session["CanAccessUserInfo"]%>';
+        if (CanAccessQuickBooks == "False") {
+             //   $('#link_UserRole').hide();
+             //   $('#link_UserManagement').hide();
+         }
+         
+     
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+    
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+    
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+        return false;
+    };
+
+         var url = $(location).attr("href").split('/').pop();
+        if($(location).attr("href").indexOf("Home.aspx") > -1)
+        {
+            $(".pagetitle").text("Home");
+            $("#appcueToggle").attr("href", "javascript:Appcues.show('41bc2713-35fc-4210-a1c6-ae16af9ca2e6')");
+            $("#appcueToggle").css("display", "block");
+        
+        }
+        else if($(location).attr("href").indexOf("TemplateList.aspx") > -1)
+        {
+            $(".pagetitle").text("Template List");
+            $("#appcueToggle").attr("href", "javascript:Appcues.show('7fee1f2c-9cd4-4baa-973c-c2195b93e2ec')");
+            $("#appcueToggle").css("display", "block");
+
+        }
+        else if ($(location).attr("href").indexOf("TemplateCreate.aspx") > -1)
+        {
+            $(".pagetitle").text("Template Settings");
+            $("#appcueToggle").attr("href", "javascript:Appcues.show('7fee1f2c-9cd4-4baa-973c-c2195b93e2ec')");
+            $("#appcueToggle").css("display", "block");
+
+        }
+
+        else if ($(location).attr("href").indexOf("ProcessList.aspx") > -1)
+        {
+            $(".pagetitle").text("Sent Document");
+            $("#appcueToggle").attr("href", "javascript:Appcues.show('5f85696b-fb69-475d-9ab1-82062ede81c1')");
+            $("#appcueToggle").css("display", "block");
+
+        }
+        else if ($(location).attr("href").indexOf("ViewPdf.aspx") > -1)
+        {
+            $(".pagetitle").text("Singed Pdf");
+            $("#appcueToggle").attr("href", "javascript:Appcues.show('5f85696b-fb69-475d-9ab1-82062ede81c1')");
+            $("#appcueToggle").css("display", "block");
+
+        }
+        else if ($(location).attr("href").indexOf("TemplateSend.aspx") > -1)
+        {
+            $(".pagetitle").text("Send PDF Template");
+            $("#appcueToggle").attr("href", "javascript:Appcues.show('5f85696b-fb69-475d-9ab1-82062ede81c1')");
+            $("#appcueToggle").css("display", "block");
+
+        }
+        
+       
+
+
+    });
+
+</script>
+
+<script>
+
+    $(window).scroll(function () {
+        var height = $(window).scrollTop();
+
+        if (height >= 70) {
+            $('nav').addClass('fixed-top');
+            $('nav').addClass('navbg-white');
+            $('.nav-item>.active').css("background-color", "rgb(28 29 96 / 34%)");
+            $('.navbar-toggler').css("background-color", "#1c1d60");
+
+
+        } else {
+            $('nav').removeClass('fixed-top');
+            $('nav').removeClass('navbg-white');
+            $('.nav-item>.active').css("background-color", "rgba(255,255,255,.1)");
+            $('.navbar-toggler').css("background-color", "transparent");
+        }
+    });
+
+    var x = window.matchMedia("(max-width: 991px)")
+    myFunction(x)
+    x.addListener(myFunction)
+
+    function myFunction(x) {
+        if (x.matches) {
+            $('.conclass').removeClass('container');
+            $('.conclass').addClass('container-fluid');
+        } else {
+            $('.conclass').addClass('container');
+            $('.conclass').removeClass('container-fluid')
+        }
+    }
+
+
+
+</script>
+        <script type="text/javascript">
+            function dropdown() {
+                document.querySelector("#submenu").classList.toggle("hidden");
+                document.querySelector("#arrow").classList.toggle("rotate-0");
+            }
+            dropdown();
+
+            function openSidebar() {
+                document.querySelector(".sidebar").classList.toggle("hidden");
+            }
+        </script>
+
+</body>
+</html>
+<%--<body>
+    <header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Home</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="nav-overlay"></div>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="TemplateList.aspx">Template List</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="ProcessList.aspx">Process List</a>
+          </li> 
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="container">
+ 
+  </div>
+    <form id="form1" runat="server">
+        <div class="container">
+            <header class="my-4">
+                <center><h1>Document Signing Process </h1></center>
+            </header>
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"  ClientIDMode="Static" />
+        </div>
+    </form>
+   
+    <asp:ContentPlaceHolder ID="ScriptContent" runat="server" />
+</body>
+</html>--%>
